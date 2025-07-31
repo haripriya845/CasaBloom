@@ -1,114 +1,104 @@
-// // script.js
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   // Handle Add to Cart buttons on index.html
-//   const buttons = document.querySelectorAll(".addToCart");
+document.addEventListener("DOMContentLoaded", () => {
+  const addButtons = document.querySelectorAll(".addToCart");
 
-//   buttons.forEach((btn) => {
-//     btn.addEventListener("click", () => {
-//       const card = btn.closest(".card");
-//       const title = card.querySelector(".card-title").innerText;
-//       const price = card.querySelector(".price").innerText.replace("/-", "").trim();
-//       const image = card.querySelector(".card-img-top").src;
+  addButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const card = button.closest(".card");
+      const name = card.querySelector(".card-title").innerText;
+      const priceText = card.querySelector(".price").innerText;
+      const price = parseFloat(priceText.replace(/[^\d.]/g, ""));
+      const image = card.querySelector("img").src;
 
-//       const product = {
-//         id: title,
-//         title: title,
-//         price: parseFloat(price),
-//         image: image,
-//         quantity: 1
-//       };
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const found = cart.find(item => item.name === name);
 
-//       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-//       const existing = cart.find(p => p.id === product.id);
+      if (found) {
+        if (found.quantity < 5) {
+          found.quantity++;
+        } else {
+          alert("Max 5 allowed!");
+        }
+      } else {
+        cart.push({ name, price, image, quantity: 1 });
+      }
 
-//       if (existing) {
-//         if (existing.quantity < 5) {
-//           existing.quantity++;
-//         } else {
-//           alert("Maximum quantity is 5");
-//         }
-//       } else {
-//         cart.push(product);
-//       }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert("Item added!");
+    });
+  });
 
-//       localStorage.setItem("cart", JSON.stringify(cart));
-//       alert("Added to cart!");
-//     });
-//   });
+  const cartBox = document.getElementById("cartContainer");
+  if (cartBox) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-//   // Handle cart display on cart.html
-//   if (window.location.pathname.includes("cart.html")) {
-//     const container = document.getElementById("cartContainer");
-//     let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      cartBox.innerHTML = "<p>Your cart is empty</p>";
+      return;
+    }
 
-//     if (cart.length === 0) {
-//       container.innerHTML = "<h3>Your cart is empty.</h3>";
-//       return;
-//     }
+    let total = 0;
 
-//     let total = 0;
+    cart.forEach(item => {
+      total += item.price * item.quantity;
 
-//     cart.forEach((item) => {
-//       total += item.price * item.quantity;
+      const box = document.createElement("div");
+      box.classList.add("card", "mb-3");
+      box.innerHTML = `
+        <div class="row g-0 align-items-center">
+          <div class="col-md-2 text-center">
+            <img src="${item.image}" class="img-fluid rounded-start" width="80">
+          </div>
+          <div class="col-md-7">
+            <div class="card-body">
+              <h5 class="card-title">${item.name}</h5>
+              <p class="card-text">Price: ₹${item.price} × ${item.quantity}</p>
+              <div class="btn-group" role="group">
+                <button class="btn btn-outline-secondary btn-sm minus">-</button>
+                <button class="btn btn-outline-secondary btn-sm plus">+</button>
+                <button class="btn btn-outline-danger btn-sm remove">Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      cartBox.appendChild(box);
 
-//       const itemDiv = document.createElement("div");
-//       itemDiv.className = "row mb-3 align-items-center border p-3";
+      box.querySelector(".plus").addEventListener("click", () => {
+        if (item.quantity < 5) {
+          item.quantity++;
+          localStorage.setItem("cart", JSON.stringify(cart));
+          location.reload();
+        } else {
+          alert("Max 5 allowed!");
+        }
+      });
 
-//       itemDiv.innerHTML = `
-//         <div class="col-md-2">
-//           <img src="${item.image}" class="img-fluid" />
-//         </div>
-//         <div class="col-md-4">
-//           <h5>${item.title}</h5>
-//           <p>₹${item.price.toFixed(2)}</p>
-//         </div>
-//         <div class="col-md-3">
-//           <button class="btn btn-outline-secondary btn-sm decrease">-</button>
-//           <span class="mx-2 quantity">${item.quantity}</span>
-//           <button class="btn btn-outline-secondary btn-sm increase">+</button>
-//         </div>
-//         <div class="col-md-3">
-//           <button class="btn btn-danger btn-sm remove">Remove</button>
-//         </div>
-//       `;
+      box.querySelector(".minus").addEventListener("click", () => {
+        if (item.quantity > 1) {
+          item.quantity--;
+        } else {
+          cart = cart.filter(p => p.name !== item.name);
+        }
+        localStorage.setItem("cart", JSON.stringify(cart));
+        location.reload();
+      });
 
-//       container.appendChild(itemDiv);
+      box.querySelector(".remove").addEventListener("click", () => {
+        cart = cart.filter(p => p.name !== item.name);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        location.reload();
+      });
+    });
 
-//       // Increase
-//       itemDiv.querySelector(".increase").onclick = () => {
-//         if (item.quantity < 5) {
-//           item.quantity++;
-//           localStorage.setItem("cart", JSON.stringify(cart));
-//           location.reload();
-//         } else {
-//           alert("Maximum quantity is 5");
-//         }
-//       };
+    const totalBox = document.createElement("div");
+    totalBox.classList.add("text-end", "mt-4");
+    totalBox.innerHTML = `<h3 class="text-primary">Total: ₹${total}</h3>`;
+    cartBox.appendChild(totalBox);
 
-//       // Decrease
-//       itemDiv.querySelector(".decrease").onclick = () => {
-//         if (item.quantity > 1) {
-//           item.quantity--;
-//         } else {
-//           cart = cart.filter(p => p.id !== item.id);
-//         }
-//         localStorage.setItem("cart", JSON.stringify(cart));
-//         location.reload();
-//       };
-
-//       // Remove
-//       itemDiv.querySelector(".remove").onclick = () => {
-//         cart = cart.filter(p => p.id !== item.id);
-//         localStorage.setItem("cart", JSON.stringify(cart));
-//         location.reload();
-//       };
-//     });
-
-//     // Show total price
-//     const totalDiv = document.createElement("div");
-//     totalDiv.className = "text-end mt-3";
-//     totalDiv.innerHTML = `<h4>Total: ₹${total.toFixed(2)}</h4>`;
-//     container.appendChild(totalDiv);
-//   }
-// });
+    const checkoutBtn = document.createElement("div");
+    checkoutBtn.classList.add("text-end", "mt-3");
+    checkoutBtn.innerHTML = `<button class="btn btn-success btn-lg">Proceed to Checkout</button>`;
+    cartBox.appendChild(checkoutBtn);
+  }
+});

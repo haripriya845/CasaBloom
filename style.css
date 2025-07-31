@@ -34,9 +34,12 @@
     top: 150px;
     left: 45px;
     text-shadow: 4px 4px 4px;
+    font-family: "Dancing Script", cursive;
+
     /* color: rgb(251, 87, 114); */
 }
-#banner-head::first-letter{
+
+#banner-head::first-letter {
     font-size: 60px;
 }
 
@@ -46,15 +49,18 @@
     top: 150px;
     left: 45px;
 }
-#list-head{
+
+#list-head {
     text-align: center;
     margin-top: 30px;
 }
-#banner-link{
+
+#banner-link {
     text-decoration: none;
     color: white;
 }
-#banner-button{
+
+#banner-button {
     position: relative;
     top: 150px;
     left: 45px;
@@ -63,16 +69,19 @@
     padding: 10px;
     border-radius: 30px;
 }
-#items{
+
+#items {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
     justify-content: space-evenly;
 }
-.card{
+
+.card {
     margin-top: 30px;
 }
-.addToCart{
+
+.addToCart {
     display: flex;
     justify-self: center;
     padding-left: 25px;
@@ -85,6 +94,5 @@
     border-radius: 30px;
 
 }
-.price{
-    
-}
+
+.price {}

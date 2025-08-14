@@ -1,21 +1,22 @@
-
 document.addEventListener("DOMContentLoaded", () => {
+  
+  // 1. Add to Cart buttons
   const addButtons = document.querySelectorAll(".addToCart");
 
   addButtons.forEach(button => {
     button.addEventListener("click", () => {
+
       const card = button.closest(".card");
       const name = card.querySelector(".card-title").innerText;
-      const priceText = card.querySelector(".price").innerText;
-      const price = parseFloat(priceText.replace(/[^\d.]/g, ""));
+      const price = parseFloat(card.querySelector(".price").innerText.replace(/[^\d.]/g, ""));
       const image = card.querySelector("img").src;
 
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const found = cart.find(item => item.name === name);
+      let item = cart.find(p => p.name === name);
 
-      if (found) {
-        if (found.quantity < 5) {
-          found.quantity++;
+      if (item) {
+        if (item.quantity < 5) {
+          item.quantity++;
         } else {
           alert("Max 5 allowed!");
         }
@@ -28,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // 2. Cart Page
   const cartBox = document.getElementById("cartContainer");
   if (cartBox) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -44,26 +46,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const box = document.createElement("div");
       box.classList.add("card", "mb-3");
+
       box.innerHTML = `
-        <div class="row g-0 align-items-center">
+        <div class="row align-items-center">
           <div class="col-md-2 text-center">
-            <img src="${item.image}" class="img-fluid rounded-start" width="80">
+            <img src="${item.image}" width="80">
           </div>
           <div class="col-md-7">
-            <div class="card-body">
-              <h5 class="card-title">${item.name}</h5>
-              <p class="card-text">Price: ₹${item.price} × ${item.quantity}</p>
-              <div class="btn-group" role="group">
-                <button class="btn btn-outline-secondary btn-sm minus">-</button>
-                <button class="btn btn-outline-secondary btn-sm plus">+</button>
-                <button class="btn btn-outline-danger btn-sm remove">Remove</button>
-              </div>
-            </div>
+            <h5>${item.name}</h5>
+            <p>Price: ₹${item.price} × ${item.quantity}</p>
+            <button class="minus">-</button>
+            <button class="plus">+</button>
+            <button class="remove">Remove</button>
           </div>
         </div>
       `;
+
       cartBox.appendChild(box);
 
+      // Plus button
       box.querySelector(".plus").addEventListener("click", () => {
         if (item.quantity < 5) {
           item.quantity++;
@@ -74,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
+      // Minus button
       box.querySelector(".minus").addEventListener("click", () => {
         if (item.quantity > 1) {
           item.quantity--;
@@ -84,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         location.reload();
       });
 
+      // Remove button
       box.querySelector(".remove").addEventListener("click", () => {
         cart = cart.filter(p => p.name !== item.name);
         localStorage.setItem("cart", JSON.stringify(cart));
@@ -91,14 +94,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+    // Show total
     const totalBox = document.createElement("div");
-    totalBox.classList.add("text-end", "mt-4");
-    totalBox.innerHTML = `<h3 class="text-primary">Total: ₹${total}</h3>`;
+    totalBox.innerHTML = `<h3>Total: ₹${total}</h3>`;
     cartBox.appendChild(totalBox);
 
+    // Checkout button
     const checkoutBtn = document.createElement("div");
-    checkoutBtn.classList.add("text-end", "mt-3");
-    checkoutBtn.innerHTML = `<button class="btn btn-success btn-lg">Proceed to Checkout</button>`;
+    checkoutBtn.innerHTML = `<button>Proceed to Checkout</button>`;
     cartBox.appendChild(checkoutBtn);
   }
 });
